@@ -61,8 +61,9 @@ class CharityApp(tk.Tk):
             fill="x", padx=16, pady=8, side="bottom")
 
         # Bouton Thème
+        # Bouton Thème
         self.theme_btn = tk.Button(self.sidebar,
-                                   text="🌓  Thème / Theme",
+                                   text="🌓  Thème / المظهر",
                                    font=FONT_SMALL, fg=TEXT_MUTED, bg=BG_SIDEBAR,
                                    activebackground=BG_CARD,
                                    relief="flat", cursor="hand2",
