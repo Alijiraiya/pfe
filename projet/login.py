@@ -1,16 +1,15 @@
 import tkinter as tk
 from tkinter import messagebox
-from theme import *
+import theme as th
 from widgets import separator
 
 DEFAULT_PASSWORD = "imam1234"
-
 
 class LoginWindow(tk.Toplevel):
     def __init__(self, parent, on_success):
         super().__init__(parent)
         self.title("Connexion  |  تسجيل الدخول")
-        self.configure(bg=BG_DARK)
+        self.configure(bg=th.BG_DARK)
         self.resizable(False, False)
         self.grab_set()
         self._on_success = on_success
@@ -26,32 +25,32 @@ class LoginWindow(tk.Toplevel):
         self.geometry(f"{w}x{h}+{(sw-w)//2}+{(sh-h)//2}")
 
     def _build(self):
-        tk.Label(self, text="🕌", font=("", 48), bg=BG_DARK).pack(pady=(20, 0))
+        tk.Label(self, text="🕌", font=("", 48), bg=th.BG_DARK).pack(pady=(20, 0))
         tk.Label(self, text="نظام إدارة التبرعات",
-                 font=("Georgia", 16, "bold"), fg=ACCENT, bg=BG_DARK).pack()
+                 font=("Georgia", 16, "bold"), fg=th.ACCENT, bg=th.BG_DARK).pack()
         tk.Label(self, text="Gestion des Dons — Mosquée",
-                 font=FONT_BODY, fg=TEXT_MUTED, bg=BG_DARK).pack(pady=(0, 10))
-        separator(self, bg=ACCENT).pack(fill="x", padx=40, pady=4)
+                 font=th.FONT_BODY, fg=th.TEXT_MUTED, bg=th.BG_DARK).pack(pady=(0, 10))
+        separator(self, bg=th.ACCENT).pack(fill="x", padx=40, pady=4)
 
-        inner = tk.Frame(self, bg=BG_DARK)
+        inner = tk.Frame(self, bg=th.BG_DARK)
         inner.pack(padx=50, pady=10, fill="x")
         tk.Label(inner, text="Mot de passe / كلمة المرور :",
-                 font=FONT_BODY, fg=TEXT_MUTED, bg=BG_DARK, anchor="w").pack(fill="x")
+                 font=th.FONT_BODY, fg=th.TEXT_MUTED, bg=th.BG_DARK, anchor="w").pack(fill="x")
         self.v_pwd = tk.StringVar()
         e = tk.Entry(inner, textvariable=self.v_pwd, font=("Helvetica", 13),
-                     show="●", bg=BG_CARD, fg=TEXT_WHITE,
-                     insertbackground=TEXT_WHITE, relief="flat", width=26,
-                     highlightthickness=2, highlightcolor=ACCENT,
-                     highlightbackground=BORDER)
+                     show="●", bg=th.BG_CARD, fg=th.TEXT_WHITE,
+                     insertbackground=th.TEXT_WHITE, relief="flat", width=26,
+                     highlightthickness=2, highlightcolor=th.ACCENT,
+                     highlightbackground=th.BORDER)
         e.pack(fill="x", pady=8, ipady=6)
         e.bind("<Return>", lambda _: self._check())
         e.focus_set()
-        self.err_lbl = tk.Label(inner, text="", font=FONT_SMALL, fg=DANGER, bg=BG_DARK)
+        self.err_lbl = tk.Label(inner, text="", font=th.FONT_SMALL, fg=th.DANGER, bg=th.BG_DARK)
         self.err_lbl.pack()
         tk.Button(inner, text="Se connecter  /  دخول",
-                  font=FONT_BUTTON, bg=ACCENT, fg=TEXT_DARK,
+                  font=th.FONT_BUTTON, bg=th.ACCENT, fg=th.TEXT_DARK,
                   relief="flat", cursor="hand2",
-                  activebackground=ACCENT2, activeforeground=TEXT_WHITE,
+                  activebackground=th.ACCENT2, activeforeground=th.TEXT_WHITE,
                   padx=20, pady=8, command=self._check).pack(pady=8)
 
     def _check(self):
