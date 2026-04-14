@@ -14,7 +14,7 @@ class DashboardPage(tk.Frame):
         header.pack(fill="x", padx=PAD*2, pady=(PAD*2, PAD))
         tk.Label(header, text="Tableau de bord  |  لوحة التحكم",
                  font=FONT_TITLE, fg=ACCENT, bg=BG_DARK).pack(side="left")
-        tk.Label(header, text=" الرحمن الرحيم بسم الله",
+        tk.Label(header, text="الرحيم الرحمن الله بسم",
                  font=("Georgia", 13, "italic"), fg=TEXT_MUTED, bg=BG_DARK).pack(side="right")
         separator(self, bg=ACCENT).pack(fill="x", padx=PAD*2, pady=4)
 
