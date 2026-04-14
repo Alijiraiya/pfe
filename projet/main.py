@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
 import theme as th
-from theme import *
 import database as db
 from login import LoginWindow
 from page_dashboard import DashboardPage
@@ -23,7 +22,7 @@ class CharityApp(tk.Tk):
         self.title("إدارة أموال التبرعات — برنامج الإمام")
         self.geometry("1280x760")
         self.minsize(950, 620)
-        self.configure(bg=BG_DARK)
+        self.configure(bg=th.BG_DARK)
         db.initialize_database()
         self._pages   = {}
         self._current = None
@@ -33,23 +32,27 @@ class CharityApp(tk.Tk):
 
     # ── Sidebar ──────────────────────────────────────────
     def _build_shell(self):
-        self.sidebar = tk.Frame(self, bg=BG_SIDEBAR, width=SIDEBAR_W)
+        self.sidebar = tk.Frame(self, bg=th.BG_SIDEBAR, width=th.SIDEBAR_W)
         self.sidebar.pack(side="left", fill="y")
         self.sidebar.pack_propagate(False)
 
-        tk.Label(self.sidebar, text="🕌", font=("", 34),
-                 bg=BG_SIDEBAR, fg=ACCENT).pack(pady=(24, 0))
-        tk.Label(self.sidebar,
-                 text="إدارة التبرعات\nGestion des Dons",
-                 font=("Georgia", 11, "bold"), fg=ACCENT,
-                 bg=BG_SIDEBAR, justify="center").pack(pady=(4, 20))
-        tk.Frame(self.sidebar, bg=BORDER, height=1).pack(fill="x", padx=16, pady=4)
+        self.lbl_logo = tk.Label(self.sidebar, text="🕌", font=("", 34),
+                                 bg=th.BG_SIDEBAR, fg=th.ACCENT)
+        self.lbl_logo.pack(pady=(24, 0))
+        self.lbl_title = tk.Label(self.sidebar,
+                                  text="إدارة التبرعات\nGestion des Dons",
+                                  font=("Georgia", 11, "bold"), fg=th.ACCENT,
+                                  bg=th.BG_SIDEBAR, justify="center")
+        self.lbl_title.pack(pady=(4, 20))
+        
+        self.sep_top = tk.Frame(self.sidebar, bg=th.BORDER, height=1)
+        self.sep_top.pack(fill="x", padx=16, pady=4)
 
         self._nav_buttons = {}
         for lbl, key in self.PAGES:
-            btn = tk.Button(self.sidebar, text=lbl, font=FONT_BODY_B,
-                            fg=TEXT_MUTED, bg=BG_SIDEBAR,
-                            activebackground=BG_CARD, activeforeground=ACCENT,
+            btn = tk.Button(self.sidebar, text=lbl, font=th.FONT_BODY_B,
+                            fg=th.TEXT_MUTED, bg=th.BG_SIDEBAR,
+                            activebackground=th.BG_CARD, activeforeground=th.ACCENT,
                             relief="flat", cursor="hand2",
                             anchor="w", padx=16, pady=10, justify="left",
                             command=lambda k=key: self.show_page(k))
@@ -57,36 +60,37 @@ class CharityApp(tk.Tk):
             self._nav_buttons[key] = btn
 
         # Séparateur bas
-        tk.Frame(self.sidebar, bg=BORDER, height=1).pack(
-            fill="x", padx=16, pady=8, side="bottom")
+        self.sep_bot = tk.Frame(self.sidebar, bg=th.BORDER, height=1)
+        self.sep_bot.pack(fill="x", padx=16, pady=8, side="bottom")
 
-        # Bouton Thème
         # Bouton Thème
         self.theme_btn = tk.Button(self.sidebar,
                                    text="🌓  Thème / المظهر",
-                                   font=FONT_SMALL, fg=TEXT_MUTED, bg=BG_SIDEBAR,
-                                   activebackground=BG_CARD,
+                                   font=th.FONT_SMALL, fg=th.TEXT_MUTED, bg=th.BG_SIDEBAR,
+                                   activebackground=th.BG_CARD,
                                    relief="flat", cursor="hand2",
                                    command=self.toggle_theme)
         self.theme_btn.pack(side="bottom", pady=4)
 
         # Bouton Sauvegarde
-        tk.Button(self.sidebar,
-                  text="💾  Sauvegarde / نسخ احتياطي",
-                  font=FONT_SMALL, fg=TEXT_MUTED, bg=BG_SIDEBAR,
-                  activebackground=BG_CARD,
-                  relief="flat", cursor="hand2",
-                  command=self._backup).pack(side="bottom", pady=4)
+        self.backup_btn = tk.Button(self.sidebar,
+                                    text="💾  Sauvegarde / نسخ احتياطي",
+                                    font=th.FONT_SMALL, fg=th.TEXT_MUTED, bg=th.BG_SIDEBAR,
+                                    activebackground=th.BG_CARD,
+                                    relief="flat", cursor="hand2",
+                                    command=self._backup)
+        self.backup_btn.pack(side="bottom", pady=4)
 
         # Bouton Quitter
-        tk.Button(self.sidebar,
-                  text="⏻  Quitter / خروج",
-                  font=FONT_SMALL, fg=DANGER, bg=BG_SIDEBAR,
-                  activebackground=DANGER, activeforeground=TEXT_WHITE,
-                  relief="flat", cursor="hand2",
-                  command=self._quit).pack(side="bottom", pady=8)
+        self.quit_btn = tk.Button(self.sidebar,
+                                  text="⏻  Quitter / خروج",
+                                  font=th.FONT_SMALL, fg=th.DANGER, bg=th.BG_SIDEBAR,
+                                  activebackground=th.DANGER, activeforeground=th.TEXT_WHITE,
+                                  relief="flat", cursor="hand2",
+                                  command=self._quit)
+        self.quit_btn.pack(side="bottom", pady=8)
 
-        self.content = tk.Frame(self, bg=BG_DARK)
+        self.content = tk.Frame(self, bg=th.BG_DARK)
         self.content.pack(side="left", fill="both", expand=True)
 
     # ── Login ─────────────────────────────────────────────
@@ -114,8 +118,8 @@ class CharityApp(tk.Tk):
         if self._current == key:
             return
         for k, btn in self._nav_buttons.items():
-            btn.config(fg=ACCENT if k == key else TEXT_MUTED,
-                       bg=BG_CARD if k == key else BG_SIDEBAR)
+            btn.config(fg=th.ACCENT if k == key else th.TEXT_MUTED,
+                       bg=th.BG_CARD if k == key else th.BG_SIDEBAR)
         page = self._pages[key]
         if hasattr(page, "refresh"):
             page.refresh()
@@ -138,24 +142,17 @@ class CharityApp(tk.Tk):
 
     def _update_sidebar(self):
         self.sidebar.config(bg=th.BG_SIDEBAR)
-        def _recurse(w):
-            try:
-                if isinstance(w, tk.Frame):
-                    w.config(bg=th.BG_SIDEBAR)
-                elif isinstance(w, tk.Label):
-                    w.config(bg=th.BG_SIDEBAR)
-                elif isinstance(w, tk.Button):
-                    if w not in self._nav_buttons.values():
-                        w.config(bg=th.BG_SIDEBAR, fg=th.TEXT_MUTED)
-                for c in w.winfo_children():
-                    _recurse(c)
-            except Exception:
-                pass
-        _recurse(self.sidebar)
+        self.lbl_logo.config(bg=th.BG_SIDEBAR, fg=th.ACCENT)
+        self.lbl_title.config(bg=th.BG_SIDEBAR, fg=th.ACCENT)
+        self.sep_top.config(bg=th.BORDER)
+        self.sep_bot.config(bg=th.BORDER)
+        self.theme_btn.config(bg=th.BG_SIDEBAR, fg=th.TEXT_MUTED)
+        self.backup_btn.config(bg=th.BG_SIDEBAR, fg=th.TEXT_MUTED)
+        self.quit_btn.config(bg=th.BG_SIDEBAR, fg=th.DANGER)
+        
         for k, btn in self._nav_buttons.items():
             btn.config(fg=th.ACCENT if k == self._current else th.TEXT_MUTED,
                        bg=th.BG_CARD if k == self._current else th.BG_SIDEBAR)
-        self.theme_btn.config(bg=th.BG_SIDEBAR, fg=th.TEXT_MUTED)
 
     # ── Sauvegarde ────────────────────────────────────────
     def _backup(self):
