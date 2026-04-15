@@ -1,16 +1,15 @@
 import tkinter as tk
 from tkinter import messagebox
-from theme import *
+import theme as th
 from widgets import (styled_button, danger_button, build_treeview,
                      entry_row, combo_row, separator)
 import database as db
-
 
 class DistributionsPage(tk.Frame):
     TYPES = ["Financiere","Alimentaire","Medicale","Fournitures","Autre"]
 
     def __init__(self, parent):
-        super().__init__(parent, bg=BG_DARK)
+        super().__init__(parent, bg=th.BG_DARK)
         self.family_names = []
         self.family_ids   = []
         self._build()
@@ -18,37 +17,37 @@ class DistributionsPage(tk.Frame):
 
     def _build(self):
         tk.Label(self, text="Distributions / Aides  |  توزيع المساعدات",
-                 font=FONT_TITLE, fg=ACCENT, bg=BG_DARK).pack(
-                     fill="x", padx=PAD*2, pady=(PAD*2, 4))
-        separator(self, bg=ACCENT).pack(fill="x", padx=PAD*2, pady=4)
+                 font=th.FONT_TITLE, fg=th.ACCENT, bg=th.BG_DARK).pack(
+                     fill="x", padx=th.PAD*2, pady=(th.PAD*2, 4))
+        separator(self, bg=th.ACCENT).pack(fill="x", padx=th.PAD*2, pady=4)
 
-        self.banner = tk.Label(self, text="", font=FONT_BODY_B,
-                               fg=SUCCESS, bg=BG_CARD, pady=8)
-        self.banner.pack(fill="x", padx=PAD*2, pady=4)
+        self.banner = tk.Label(self, text="", font=th.FONT_BODY_B,
+                               fg=th.SUCCESS, bg=th.BG_CARD, pady=8)
+        self.banner.pack(fill="x", padx=th.PAD*2, pady=4)
 
         tf, self.tree = build_treeview(self,
             ["id","family","amount","type","date","notes"],
             ["#","Famille / العائلة","Montant DA","Type","Date","Notes"],
             [40,200,100,110,110,250], height=13)
-        tf.pack(fill="both", expand=True, padx=PAD*2, pady=PAD)
+        tf.pack(fill="both", expand=True, padx=th.PAD*2, pady=th.PAD)
 
-        form = tk.Frame(self, bg=BG_DARK)
-        form.pack(fill="x", padx=PAD*2, pady=4)
+        form = tk.Frame(self, bg=th.BG_DARK)
+        form.pack(fill="x", padx=th.PAD*2, pady=4)
 
-        tk.Label(form, text="Famille / العائلة :", font=FONT_BODY,
-                 fg=TEXT_MUTED, bg=BG_DARK).pack(side="left")
+        tk.Label(form, text="Famille / العائلة :", font=th.FONT_BODY,
+                 fg=th.TEXT_MUTED, bg=th.BG_DARK).pack(side="left")
         self.v_family = tk.StringVar()
         self.family_cb = tk.OptionMenu(form, self.v_family, "")
-        self.family_cb.config(bg=BG_CARD, fg=TEXT_WHITE, font=FONT_BODY,
-                              activebackground=ACCENT, highlightthickness=0)
-        self.family_cb["menu"].config(bg=BG_CARD, fg=TEXT_WHITE, font=FONT_BODY)
+        self.family_cb.config(bg=th.BG_CARD, fg=th.TEXT_WHITE, font=th.FONT_BODY,
+                              activebackground=th.ACCENT, highlightthickness=0)
+        self.family_cb["menu"].config(bg=th.BG_CARD, fg=th.TEXT_WHITE, font=th.FONT_BODY)
         self.family_cb.pack(side="left", padx=8)
 
-        f, self.v_amt,  _ = entry_row(form, "Montant DA :", bg=BG_DARK, width=10); f.pack(side="left", padx=6)
-        f, self.v_type, _ = combo_row(form, "Type :", self.TYPES, bg=BG_DARK, width=14);   f.pack(side="left", padx=6)
-        f, self.v_note, _ = entry_row(form, "Notes :", bg=BG_DARK, width=20); f.pack(side="left", padx=6)
+        f, self.v_amt,  _ = entry_row(form, "Montant DA :", bg=th.BG_DARK, width=10); f.pack(side="left", padx=6)
+        f, self.v_type, _ = combo_row(form, "Type :", self.TYPES, bg=th.BG_DARK, width=14);   f.pack(side="left", padx=6)
+        f, self.v_note, _ = entry_row(form, "Notes :", bg=th.BG_DARK, width=20); f.pack(side="left", padx=6)
 
-        bb = tk.Frame(self, bg=BG_DARK); bb.pack(pady=6)
+        bb = tk.Frame(self, bg=th.BG_DARK); bb.pack(pady=6)
         styled_button(bb, "➕ Enregistrer aide / تسجيل مساعدة", self._add).pack(side="left", padx=8)
         danger_button(bb, "🗑️ Supprimer / حذف", self._delete).pack(side="left", padx=8)
 
@@ -76,7 +75,7 @@ class DistributionsPage(tk.Frame):
         to = db.get_total_distributions()
         bal = ti - to
         self.banner.config(
-            fg=SUCCESS if bal >= 0 else DANGER,
+            fg=th.SUCCESS if bal >= 0 else th.DANGER,
             text=(f"  💵 Total reçu : {ti:,.0f} DA   |   "
                   f"📤 Total distribué : {to:,.0f} DA   |   "
                   f"⚖️ Solde : {bal:,.0f} DA  ")
