@@ -1,62 +1,56 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
-from theme import *
+import theme as th
 from widgets import (styled_button, danger_button, build_treeview,
                      section_title, entry_row, combo_row, separator)
 import database as db
 
-
 class FamiliesPage(tk.Frame):
     def __init__(self, parent):
-        super().__init__(parent, bg=BG_DARK)
+        super().__init__(parent, bg=th.BG_DARK)
         self._selected_id = None
         self._build()
         self.load_families()
 
     def _build(self):
         tk.Label(self, text="Gestion des Familles  |  إدارة العائلات",
-                 font=FONT_TITLE, fg=ACCENT, bg=BG_DARK).pack(
-                     fill="x", padx=PAD*2, pady=(PAD*2, 4))
-        separator(self, bg=ACCENT).pack(fill="x", padx=PAD*2, pady=4)
+                 font=th.FONT_TITLE, fg=th.ACCENT, bg=th.BG_DARK).pack(
+                     fill="x", padx=th.PAD*2, pady=(th.PAD*2, 4))
+        separator(self, bg=th.ACCENT).pack(fill="x", padx=th.PAD*2, pady=4)
 
-        sf = tk.Frame(self, bg=BG_DARK)
-        sf.pack(fill="x", padx=PAD*2, pady=4)
-        tk.Label(sf, text="🔍 Recherche / بحث :", font=FONT_BODY,
-                 fg=TEXT_MUTED, bg=BG_DARK).pack(side="left")
+        sf = tk.Frame(self, bg=th.BG_DARK)
+        sf.pack(fill="x", padx=th.PAD*2, pady=4)
+        tk.Label(sf, text="🔍 Recherche / بحث :", font=th.FONT_BODY,
+                 fg=th.TEXT_MUTED, bg=th.BG_DARK).pack(side="left")
         self.search_var = tk.StringVar()
         self.search_var.trace_add("write", lambda *_: self.do_search())
-        tk.Entry(sf, textvariable=self.search_var, font=FONT_BODY,
-                 bg=BG_CARD, fg=TEXT_WHITE, insertbackground=TEXT_WHITE,
+        tk.Entry(sf, textvariable=self.search_var, font=th.FONT_BODY,
+                 bg=th.BG_CARD, fg=th.TEXT_WHITE, insertbackground=th.TEXT_WHITE,
                  relief="flat", width=38,
-                 highlightthickness=1, highlightcolor=ACCENT,
-                 highlightbackground=BORDER).pack(side="left", padx=8)
+                 highlightthickness=1, highlightcolor=th.ACCENT,
+                 highlightbackground=th.BORDER).pack(side="left", padx=8)
 
         cols   = ["id","name","spouse","phone","marital","members","job","income","housing","score"]
         heads  = ["#","Chef famille","Époux/se","Tél","Situation","Membres","Emploi","Revenu DA","Logement","Score"]
         widths = [35,160,140,100,80,60,110,90,100,55]
         tf, self.tree = build_treeview(self, cols, heads, widths, height=15)
-        tf.pack(fill="both", expand=True, padx=PAD*2, pady=(4, 0))
+        tf.pack(fill="both", expand=True, padx=th.PAD*2, pady=(4, 0))
         self.tree.bind("<<TreeviewSelect>>", self.on_select)
 
-        bb = tk.Frame(self, bg=BG_DARK)
+        bb = tk.Frame(self, bg=th.BG_DARK)
         bb.pack(pady=8)
         styled_button(bb, "➕ Ajouter / إضافة",       self.open_add_form).pack(side="left", padx=4)
-        styled_button(bb, "✏️ Modifier / تعديل",      self.open_edit_form, color=ACCENT2, fg=TEXT_WHITE).pack(side="left", padx=4)
+        styled_button(bb, "✏️ Modifier / تعديل",      self.open_edit_form, color=th.ACCENT2, fg=th.TEXT_WHITE).pack(side="left", padx=4)
         danger_button(bb, "🗑️ Supprimer / حذف",       self.delete_family).pack(side="left", padx=4)
-        styled_button(bb, "👶 Enfants / أطفال",       self.open_children, color="#5B9BD5", fg=TEXT_WHITE).pack(side="left", padx=4)
-        styled_button(bb, "📋 Fiche complète / ملف",  self.open_detail,   color="#7D5A9E", fg=TEXT_WHITE).pack(side="left", padx=4)
-        styled_button(bb, "📤 Distribution / توزيع",  self.open_distribution, color="#9B59B6", fg=TEXT_WHITE).pack(side="left", padx=4)
+        styled_button(bb, "👶 Enfants / أطفال",       self.open_children, color="#5B9BD5", fg=th.TEXT_WHITE).pack(side="left", padx=4)
+        styled_button(bb, "📋 Fiche complète / ملف",  self.open_detail,   color="#7D5A9E", fg=th.TEXT_WHITE).pack(side="left", padx=4)
+        styled_button(bb, "📤 Distribution / توزيع",  self.open_distribution, color="#9B59B6", fg=th.TEXT_WHITE).pack(side="left", padx=4)
 
     def load_families(self, rows=None):
         for r in self.tree.get_children():
             self.tree.delete(r)
         data = rows if rows is not None else db.get_all_families()
         for r in data:
-            # 0=id,1=head,2=spouse,3=phone,4=addr,5=ccp,
-            # 6=income,7=rent,8=employ,9=src,
-            # 10=marital,11=members,12=social,
-            # 13=health,14=chronic,
-            # 15=renting,16=htype,17=hsurf,18=hrooms,19=hcond,20=score
             self.tree.insert("", "end", iid=str(r[0]),
                              values=(r[0], r[1], r[2], r[3],
                                      r[10], r[11], r[8],
@@ -141,7 +135,7 @@ class FamilyForm(tk.Toplevel):
     def __init__(self, parent, title, on_save, prefill=None):
         super().__init__(parent)
         self.title(title)
-        self.configure(bg=BG_DARK)
+        self.configure(bg=th.BG_DARK)
         self.grab_set()
         self._on_save = on_save
         self._p = prefill
@@ -150,18 +144,18 @@ class FamilyForm(tk.Toplevel):
         self._build()
 
     def _build(self):
-        tk.Label(self, text=self.title(), font=FONT_HEADING,
-                 fg=ACCENT, bg=BG_DARK).pack(pady=(12, 4))
-        separator(self, bg=ACCENT).pack(fill="x", padx=16)
+        tk.Label(self, text=self.title(), font=th.FONT_HEADING,
+                 fg=th.ACCENT, bg=th.BG_DARK).pack(pady=(12, 4))
+        separator(self, bg=th.ACCENT).pack(fill="x", padx=16)
 
         apply_ttk_styles_nb()
         nb = ttk.Notebook(self, style="D.TNotebook")
         nb.pack(fill="both", expand=True, padx=12, pady=6)
 
-        t1 = tk.Frame(nb, bg=BG_CARD); nb.add(t1, text="  Identité  ")
-        t2 = tk.Frame(nb, bg=BG_CARD); nb.add(t2, text="  Finances  ")
-        t3 = tk.Frame(nb, bg=BG_CARD); nb.add(t3, text="  Logement  ")
-        t4 = tk.Frame(nb, bg=BG_CARD); nb.add(t4, text="  Santé     ")
+        t1 = tk.Frame(nb, bg=th.BG_CARD); nb.add(t1, text="  Identité  ")
+        t2 = tk.Frame(nb, bg=th.BG_CARD); nb.add(t2, text="  Finances  ")
+        t3 = tk.Frame(nb, bg=th.BG_CARD); nb.add(t3, text="  Logement  ")
+        t4 = tk.Frame(nb, bg=th.BG_CARD); nb.add(t4, text="  Santé     ")
 
         self._tab_identite(t1)
         self._tab_finances(t2)
@@ -170,19 +164,19 @@ class FamilyForm(tk.Toplevel):
         if self._p:
             self._prefill()
 
-        separator(self, bg=BORDER).pack(fill="x", padx=16, pady=4)
-        bf = tk.Frame(self, bg=BG_DARK)
+        separator(self, bg=th.BORDER).pack(fill="x", padx=16, pady=4)
+        bf = tk.Frame(self, bg=th.BG_DARK)
         bf.pack(pady=8)
         styled_button(bf, "💾 Enregistrer / حفظ", self._save).pack(side="left", padx=10)
         danger_button(bf, "✖ Annuler / إلغاء",   self.destroy).pack(side="left", padx=10)
 
-    def _r(self, p, lbl, w=24): return entry_row(p, lbl, bg=BG_CARD, width=w)
-    def _c(self, p, lbl, vals, w=18): return combo_row(p, lbl, vals, bg=BG_CARD, width=w)
+    def _r(self, p, lbl, w=24): return entry_row(p, lbl, bg=th.BG_CARD, width=w)
+    def _c(self, p, lbl, vals, w=18): return combo_row(p, lbl, vals, bg=th.BG_CARD, width=w)
     def _pk(self, f): f.pack(fill="x", padx=20, pady=3)
 
     def _tab_identite(self, t):
         tk.Label(t, text="Informations d'identité / معلومات الهوية",
-                 font=FONT_BODY_B, fg=ACCENT, bg=BG_CARD).pack(pady=(10, 4))
+                 font=th.FONT_BODY_B, fg=th.ACCENT, bg=th.BG_CARD).pack(pady=(10, 4))
         f, self.v_head,    _ = self._r(t, "Nom chef de famille / اسم رب الأسرة :"); self._pk(f)
         f, self.v_spouse,  _ = self._r(t, "Nom époux/se / اسم الزوج(ة) :");         self._pk(f)
         f, self.v_phone,   _ = self._r(t, "Téléphone / الهاتف :");                   self._pk(f)
@@ -195,7 +189,7 @@ class FamilyForm(tk.Toplevel):
 
     def _tab_finances(self, t):
         tk.Label(t, text="Situation financière / الوضع المالي",
-                 font=FONT_BODY_B, fg=ACCENT, bg=BG_CARD).pack(pady=(10, 4))
+                 font=th.FONT_BODY_B, fg=th.ACCENT, bg=th.BG_CARD).pack(pady=(10, 4))
         f, self.v_income, _ = self._r(t, "Revenu mensuel (DA) / الدخل الشهري :", 14); self._pk(f)
         self.v_income.set("0")
         f, self.v_rent,   _ = self._r(t, "Montant loyer (DA) / مبلغ الإيجار :", 14);  self._pk(f)
@@ -205,7 +199,7 @@ class FamilyForm(tk.Toplevel):
 
     def _tab_logement(self, t):
         tk.Label(t, text="Conditions de logement / ظروف السكن",
-                 font=FONT_BODY_B, fg=ACCENT, bg=BG_CARD).pack(pady=(10, 4))
+                 font=th.FONT_BODY_B, fg=th.ACCENT, bg=th.BG_CARD).pack(pady=(10, 4))
         f, self.v_renting, _ = self._c(t, "Locataire / مستأجر :", self.YESNO);           self._pk(f)
         f, self.v_htype,   _ = self._c(t, "Type logement / نوع السكن :", self.HTYPE);     self._pk(f)
         f, self.v_hsurf,   _ = self._r(t, "Surface (m²) / المساحة :", 10);                self._pk(f)
@@ -216,7 +210,7 @@ class FamilyForm(tk.Toplevel):
 
     def _tab_sante(self, t):
         tk.Label(t, text="Santé de la famille / صحة الأسرة",
-                 font=FONT_BODY_B, fg=ACCENT, bg=BG_CARD).pack(pady=(10, 4))
+                 font=th.FONT_BODY_B, fg=th.ACCENT, bg=th.BG_CARD).pack(pady=(10, 4))
         f, self.v_health,  _ = self._c(t, "État de santé / الحالة الصحية :", self.HEALTH); self._pk(f)
         f, self.v_chronic, _ = self._r(t, "Maladies chroniques / أمراض مزمنة :", 24);      self._pk(f)
 
@@ -264,12 +258,12 @@ class FamilyForm(tk.Toplevel):
 def apply_ttk_styles_nb():
     s = ttk.Style()
     s.theme_use("clam")
-    s.configure("D.TNotebook",     background=BG_DARK, borderwidth=0)
-    s.configure("D.TNotebook.Tab", background=BG_SIDEBAR, foreground=TEXT_MUTED,
-                font=FONT_BODY_B, padding=[10, 5])
+    s.configure("D.TNotebook",     background=th.BG_DARK, borderwidth=0)
+    s.configure("D.TNotebook.Tab", background=th.BG_SIDEBAR, foreground=th.TEXT_MUTED,
+                font=th.FONT_BODY_B, padding=[10, 5])
     s.map("D.TNotebook.Tab",
-          background=[("selected", BG_CARD)],
-          foreground=[("selected", ACCENT)])
+          background=[("selected", th.BG_CARD)],
+          foreground=[("selected", th.ACCENT)])
 
 
 # ══════════════════════════════════════════════════════
@@ -285,7 +279,7 @@ class ChildrenWindow(tk.Toplevel):
     def __init__(self, parent, family_id, family_name):
         super().__init__(parent)
         self.title(f"Enfants — {family_name}  |  أطفال")
-        self.configure(bg=BG_DARK)
+        self.configure(bg=th.BG_DARK)
         self.grab_set()
         self.fid   = family_id
         self.fname = family_name
@@ -297,8 +291,8 @@ class ChildrenWindow(tk.Toplevel):
 
     def _build(self):
         tk.Label(self, text=f"Enfants de : {self.fname}  |  أطفال",
-                 font=FONT_HEADING, fg=ACCENT, bg=BG_DARK).pack(pady=(12, 4))
-        separator(self, bg=ACCENT).pack(fill="x", padx=16)
+                 font=th.FONT_HEADING, fg=th.ACCENT, bg=th.BG_DARK).pack(pady=(12, 4))
+        separator(self, bg=th.ACCENT).pack(fill="x", padx=16)
 
         cols  = ["id","name","dob","gender","orphan","school","level","health","follow","vaccines"]
         heads = ["#","Nom","Naissance","Sexe","Orphelin","Scolarité","Niveau","Santé","Suivi","Vaccins"]
@@ -311,40 +305,40 @@ class ChildrenWindow(tk.Toplevel):
         nb = ttk.Notebook(self, style="D.TNotebook")
         nb.pack(fill="x", padx=16, pady=4)
 
-        ti = tk.Frame(nb, bg=BG_CARD); nb.add(ti, text="  Identité / Scolarité  ")
-        ts = tk.Frame(nb, bg=BG_CARD); nb.add(ts, text="  Santé / Besoins  ")
+        ti = tk.Frame(nb, bg=th.BG_CARD); nb.add(ti, text="  Identité / Scolarité  ")
+        ts = tk.Frame(nb, bg=th.BG_CARD); nb.add(ts, text="  Santé / Besoins  ")
 
         # Tab 1
-        row1 = tk.Frame(ti, bg=BG_CARD); row1.pack(fill="x", padx=10, pady=4)
-        f, self.vc_name,   _ = entry_row(row1, "Nom :", bg=BG_CARD, width=16);           f.pack(side="left", padx=4)
-        f, self.vc_dob,    _ = entry_row(row1, "Naissance (AAAA-MM-JJ) :", bg=BG_CARD, width=12); f.pack(side="left", padx=4)
+        row1 = tk.Frame(ti, bg=th.BG_CARD); row1.pack(fill="x", padx=10, pady=4)
+        f, self.vc_name,   _ = entry_row(row1, "Nom :", bg=th.BG_CARD, width=16);           f.pack(side="left", padx=4)
+        f, self.vc_dob,    _ = entry_row(row1, "Naissance (AAAA-MM-JJ) :", bg=th.BG_CARD, width=12); f.pack(side="left", padx=4)
         self.vc_dob.set("YYYY-MM-DD")
-        f, self.vc_gender, _ = combo_row(row1, "Sexe :", self.GENDER, bg=BG_CARD, width=10); f.pack(side="left", padx=4)
-        f, self.vc_orphan, _ = combo_row(row1, "Orphelin :", self.YESNO, bg=BG_CARD, width=6);  f.pack(side="left", padx=4)
+        f, self.vc_gender, _ = combo_row(row1, "Sexe :", self.GENDER, bg=th.BG_CARD, width=10); f.pack(side="left", padx=4)
+        f, self.vc_orphan, _ = combo_row(row1, "Orphelin :", self.YESNO, bg=th.BG_CARD, width=6);  f.pack(side="left", padx=4)
 
-        row2 = tk.Frame(ti, bg=BG_CARD); row2.pack(fill="x", padx=10, pady=4)
-        f, self.vc_school,  _ = combo_row(row2, "Scolarité :", self.SCHOOL, bg=BG_CARD, width=18); f.pack(side="left", padx=4)
-        f, self.vc_level,   _ = entry_row(row2, "Niveau :", bg=BG_CARD, width=12);  f.pack(side="left", padx=4)
-        f, self.vc_sname,   _ = entry_row(row2, "Établissement :", bg=BG_CARD, width=16); f.pack(side="left", padx=4)
+        row2 = tk.Frame(ti, bg=th.BG_CARD); row2.pack(fill="x", padx=10, pady=4)
+        f, self.vc_school,  _ = combo_row(row2, "Scolarité :", self.SCHOOL, bg=th.BG_CARD, width=18); f.pack(side="left", padx=4)
+        f, self.vc_level,   _ = entry_row(row2, "Niveau :", bg=th.BG_CARD, width=12);  f.pack(side="left", padx=4)
+        f, self.vc_sname,   _ = entry_row(row2, "Établissement :", bg=th.BG_CARD, width=16); f.pack(side="left", padx=4)
 
-        row3 = tk.Frame(ti, bg=BG_CARD); row3.pack(fill="x", padx=10, pady=4)
-        f, self.vc_results, _ = combo_row(row3, "Résultats :", self.RESULTS, bg=BG_CARD, width=12); f.pack(side="left", padx=4)
-        f, self.vc_dropout, _ = combo_row(row3, "Risque décrochage :", self.YESNO, bg=BG_CARD, width=6); f.pack(side="left", padx=4)
+        row3 = tk.Frame(ti, bg=th.BG_CARD); row3.pack(fill="x", padx=10, pady=4)
+        f, self.vc_results, _ = combo_row(row3, "Résultats :", self.RESULTS, bg=th.BG_CARD, width=12); f.pack(side="left", padx=4)
+        f, self.vc_dropout, _ = combo_row(row3, "Risque décrochage :", self.YESNO, bg=th.BG_CARD, width=6); f.pack(side="left", padx=4)
 
         # Tab 2
-        row4 = tk.Frame(ts, bg=BG_CARD); row4.pack(fill="x", padx=10, pady=4)
-        f, self.vc_health,   _ = combo_row(row4, "Santé :", self.HEALTH, bg=BG_CARD, width=16);  f.pack(side="left", padx=4)
-        f, self.vc_disease,  _ = entry_row(row4, "Type maladie :", bg=BG_CARD, width=16);        f.pack(side="left", padx=4)
-        f, self.vc_allergy,  _ = entry_row(row4, "Allergies :", bg=BG_CARD, width=14);           f.pack(side="left", padx=4)
+        row4 = tk.Frame(ts, bg=th.BG_CARD); row4.pack(fill="x", padx=10, pady=4)
+        f, self.vc_health,   _ = combo_row(row4, "Santé :", self.HEALTH, bg=th.BG_CARD, width=16);  f.pack(side="left", padx=4)
+        f, self.vc_disease,  _ = entry_row(row4, "Type maladie :", bg=th.BG_CARD, width=16);        f.pack(side="left", padx=4)
+        f, self.vc_allergy,  _ = entry_row(row4, "Allergies :", bg=th.BG_CARD, width=14);           f.pack(side="left", padx=4)
 
-        row5 = tk.Frame(ts, bg=BG_CARD); row5.pack(fill="x", padx=10, pady=4)
-        f, self.vc_follow,   _ = combo_row(row5, "Suivi médical :", self.YESNO, bg=BG_CARD, width=6);   f.pack(side="left", padx=4)
-        f, self.vc_vaccines, _ = combo_row(row5, "Vaccins à jour :", self.YESNO, bg=BG_CARD, width=6);  f.pack(side="left", padx=4)
-        f, self.vc_needs,    _ = entry_row(row5, "Besoins spécifiques :", bg=BG_CARD, width=24);         f.pack(side="left", padx=4)
+        row5 = tk.Frame(ts, bg=th.BG_CARD); row5.pack(fill="x", padx=10, pady=4)
+        f, self.vc_follow,   _ = combo_row(row5, "Suivi médical :", self.YESNO, bg=th.BG_CARD, width=6);   f.pack(side="left", padx=4)
+        f, self.vc_vaccines, _ = combo_row(row5, "Vaccins à jour :", self.YESNO, bg=th.BG_CARD, width=6);  f.pack(side="left", padx=4)
+        f, self.vc_needs,    _ = entry_row(row5, "Besoins spécifiques :", bg=th.BG_CARD, width=24);         f.pack(side="left", padx=4)
 
-        bb = tk.Frame(self, bg=BG_DARK); bb.pack(pady=6)
+        bb = tk.Frame(self, bg=th.BG_DARK); bb.pack(pady=6)
         styled_button(bb, "➕ Ajouter enfant",   self._add).pack(side="left", padx=4)
-        styled_button(bb, "✏️ Modifier",         self._edit, color=ACCENT2, fg=TEXT_WHITE).pack(side="left", padx=4)
+        styled_button(bb, "✏️ Modifier",         self._edit, color=th.ACCENT2, fg=th.TEXT_WHITE).pack(side="left", padx=4)
         danger_button(bb, "🗑️ Supprimer",        self._delete).pack(side="left", padx=4)
 
     def _load(self):
@@ -415,28 +409,28 @@ class FamilyDetailWindow(tk.Toplevel):
     def __init__(self, parent, row):
         super().__init__(parent)
         self.title(f"Fiche complète — {row[1]}")
-        self.configure(bg=BG_DARK)
+        self.configure(bg=th.BG_DARK)
         self.grab_set()
         sw, sh = self.winfo_screenwidth(), self.winfo_screenheight()
         self.geometry(f"720x700+{(sw-720)//2}+{(sh-700)//2}")
         self._build(row)
 
     def _line(self, parent, lbl, val):
-        f = tk.Frame(parent, bg=BG_CARD)
-        tk.Label(f, text=lbl + "  ", font=FONT_BODY_B, fg=TEXT_MUTED,
-                 bg=BG_CARD, width=30, anchor="w").pack(side="left")
-        tk.Label(f, text=str(val), font=FONT_BODY, fg=TEXT_WHITE,
-                 bg=BG_CARD, anchor="w").pack(side="left")
+        f = tk.Frame(parent, bg=th.BG_CARD)
+        tk.Label(f, text=lbl + "  ", font=th.FONT_BODY_B, fg=th.TEXT_MUTED,
+                 bg=th.BG_CARD, width=30, anchor="w").pack(side="left")
+        tk.Label(f, text=str(val), font=th.FONT_BODY, fg=th.TEXT_WHITE,
+                 bg=th.BG_CARD, anchor="w").pack(side="left")
         return f
 
     def _build(self, p):
         tk.Label(self, text=f"Fiche Famille — {p[1]}",
-                 font=FONT_TITLE, fg=ACCENT, bg=BG_DARK).pack(pady=(16, 4))
-        separator(self, bg=ACCENT).pack(fill="x", padx=20)
+                 font=th.FONT_TITLE, fg=th.ACCENT, bg=th.BG_DARK).pack(pady=(16, 4))
+        separator(self, bg=th.ACCENT).pack(fill="x", padx=20)
 
-        canvas = tk.Canvas(self, bg=BG_DARK, highlightthickness=0)
+        canvas = tk.Canvas(self, bg=th.BG_DARK, highlightthickness=0)
         vsb = ttk.Scrollbar(self, orient="vertical", command=canvas.yview)
-        inner = tk.Frame(canvas, bg=BG_DARK)
+        inner = tk.Frame(canvas, bg=th.BG_DARK)
         inner.bind("<Configure>",
                    lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
         canvas.create_window((0, 0), window=inner, anchor="nw")
@@ -475,45 +469,45 @@ class FamilyDetailWindow(tk.Toplevel):
         ]
 
         for sec_title, lines in sections:
-            sec = tk.Frame(inner, bg=BG_CARD,
-                           highlightthickness=1, highlightbackground=BORDER)
+            sec = tk.Frame(inner, bg=th.BG_CARD,
+                           highlightthickness=1, highlightbackground=th.BORDER)
             sec.pack(fill="x", pady=6, padx=4)
-            tk.Label(sec, text=sec_title, font=FONT_HEADING,
-                     fg=ACCENT, bg=BG_CARD).pack(anchor="w", padx=12, pady=(8, 4))
-            separator(sec, bg=BORDER).pack(fill="x", padx=12)
+            tk.Label(sec, text=sec_title, font=th.FONT_HEADING,
+                     fg=th.ACCENT, bg=th.BG_CARD).pack(anchor="w", padx=12, pady=(8, 4))
+            separator(sec, bg=th.BORDER).pack(fill="x", padx=12)
             for lbl, val in lines:
                 self._line(sec, lbl, val).pack(fill="x", padx=20, pady=2)
-            tk.Label(sec, text="", bg=BG_CARD).pack()
+            tk.Label(sec, text="", bg=th.BG_CARD).pack()
 
         # Historique des aides
-        sec = tk.Frame(inner, bg=BG_CARD,
-                       highlightthickness=1, highlightbackground=BORDER)
+        sec = tk.Frame(inner, bg=th.BG_CARD,
+                       highlightthickness=1, highlightbackground=th.BORDER)
         sec.pack(fill="x", pady=6, padx=4)
         tk.Label(sec, text="📋 Historique des aides / سجل المساعدات",
-                 font=FONT_HEADING, fg=ACCENT, bg=BG_CARD).pack(anchor="w", padx=12, pady=(8, 4))
-        separator(sec, bg=BORDER).pack(fill="x", padx=12)
+                 font=th.FONT_HEADING, fg=th.ACCENT, bg=th.BG_CARD).pack(anchor="w", padx=12, pady=(8, 4))
+        separator(sec, bg=th.BORDER).pack(fill="x", padx=12)
         dists = db.get_distributions_by_family(p[0])
         total_recu = 0
         if dists:
             for d in dists:
                 total_recu += d[2]
                 txt = f"  {d[5]}  •  {d[2]:,.0f} DA  •  {d[3]}  •  {d[4]}"
-                tk.Label(sec, text=txt, font=FONT_BODY,
-                         fg=TEXT_WHITE, bg=BG_CARD).pack(anchor="w", padx=20, pady=2)
+                tk.Label(sec, text=txt, font=th.FONT_BODY,
+                         fg=th.TEXT_WHITE, bg=th.BG_CARD).pack(anchor="w", padx=20, pady=2)
             tk.Label(sec, text=f"  Total reçu : {total_recu:,.0f} DA",
-                     font=FONT_BODY_B, fg=ACCENT, bg=BG_CARD).pack(anchor="w", padx=20, pady=4)
+                     font=th.FONT_BODY_B, fg=th.ACCENT, bg=th.BG_CARD).pack(anchor="w", padx=20, pady=4)
         else:
             tk.Label(sec, text="  Aucune aide enregistrée.",
-                     font=FONT_BODY, fg=TEXT_MUTED, bg=BG_CARD).pack(anchor="w", padx=20, pady=6)
+                     font=th.FONT_BODY, fg=th.TEXT_MUTED, bg=th.BG_CARD).pack(anchor="w", padx=20, pady=6)
 
         children = db.get_children_by_family(p[0])
         if children:
             tk.Label(sec, text=f"  Enfants enregistrés : {len(children)}",
-                     font=FONT_BODY_B, fg=ACCENT2, bg=BG_CARD).pack(anchor="w", padx=20, pady=4)
-        tk.Label(sec, text="", bg=BG_CARD).pack()
+                     font=th.FONT_BODY_B, fg=th.ACCENT2, bg=th.BG_CARD).pack(anchor="w", padx=20, pady=4)
+        tk.Label(sec, text="", bg=th.BG_CARD).pack()
 
         styled_button(self, "✖ Fermer", self.destroy,
-                      color=DANGER, fg=TEXT_WHITE).pack(pady=10)
+                      color=th.DANGER, fg=th.TEXT_WHITE).pack(pady=10)
 
 
 # ══════════════════════════════════════════════════════
@@ -525,7 +519,7 @@ class DistributionDialog(tk.Toplevel):
     def __init__(self, parent, family_id, family_name, on_done):
         super().__init__(parent)
         self.title(f"Distribution — {family_name}")
-        self.configure(bg=BG_DARK)
+        self.configure(bg=th.BG_DARK)
         self.grab_set()
         self.resizable(False, False)
         self._fid     = family_id
@@ -536,16 +530,16 @@ class DistributionDialog(tk.Toplevel):
 
     def _build(self, name):
         tk.Label(self, text=f"Aide pour : {name}",
-                 font=FONT_HEADING, fg=ACCENT, bg=BG_DARK).pack(pady=(16, 4))
-        separator(self, bg=ACCENT).pack(fill="x", padx=20)
+                 font=th.FONT_HEADING, fg=th.ACCENT, bg=th.BG_DARK).pack(pady=(16, 4))
+        separator(self, bg=th.ACCENT).pack(fill="x", padx=20)
 
-        inner = tk.Frame(self, bg=BG_DARK)
+        inner = tk.Frame(self, bg=th.BG_DARK)
         inner.pack(padx=30, pady=12, fill="x")
-        f, self.v_amt,  _ = entry_row(inner, "Montant (DA) / المبلغ :", bg=BG_DARK, width=16); f.pack(fill="x", pady=4)
-        f, self.v_type, _ = combo_row(inner, "Type d'aide / نوع المساعدة :", self.TYPES, bg=BG_DARK, width=16); f.pack(fill="x", pady=4)
-        f, self.v_note, _ = entry_row(inner, "Notes / ملاحظات :", bg=BG_DARK, width=22); f.pack(fill="x", pady=4)
+        f, self.v_amt,  _ = entry_row(inner, "Montant (DA) / المبلغ :", bg=th.BG_DARK, width=16); f.pack(fill="x", pady=4)
+        f, self.v_type, _ = combo_row(inner, "Type d'aide / نوع المساعدة :", self.TYPES, bg=th.BG_DARK, width=16); f.pack(fill="x", pady=4)
+        f, self.v_note, _ = entry_row(inner, "Notes / ملاحظات :", bg=th.BG_DARK, width=22); f.pack(fill="x", pady=4)
 
-        bb = tk.Frame(self, bg=BG_DARK); bb.pack(pady=10)
+        bb = tk.Frame(self, bg=th.BG_DARK); bb.pack(pady=10)
         styled_button(bb, "💾 Valider / تأكيد", self._save).pack(side="left", padx=8)
         danger_button(bb, "✖ Annuler / إلغاء",  self.destroy).pack(side="left", padx=8)
 
