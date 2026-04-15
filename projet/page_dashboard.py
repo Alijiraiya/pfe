@@ -1,41 +1,40 @@
 import tkinter as tk
-from theme import *
+import theme as th
 from widgets import stat_card, section_title, separator
 import database as db
 
-
 class DashboardPage(tk.Frame):
     def __init__(self, parent):
-        super().__init__(parent, bg=BG_DARK)
+        super().__init__(parent, bg=th.BG_DARK)
         self._build()
 
     def _build(self):
-        header = tk.Frame(self, bg=BG_DARK)
-        header.pack(fill="x", padx=PAD*2, pady=(PAD*2, PAD))
+        header = tk.Frame(self, bg=th.BG_DARK)
+        header.pack(fill="x", padx=th.PAD*2, pady=(th.PAD*2, th.PAD))
         tk.Label(header, text="Tableau de bord  |  لوحة التحكم",
-                 font=FONT_TITLE, fg=ACCENT, bg=BG_DARK).pack(side="left")
+                 font=th.FONT_TITLE, fg=th.ACCENT, bg=th.BG_DARK).pack(side="left")
         tk.Label(header, text="الرحيم الرحمن الله بسم",
-                 font=("Georgia", 13, "italic"), fg=TEXT_MUTED, bg=BG_DARK).pack(side="right")
-        separator(self, bg=ACCENT).pack(fill="x", padx=PAD*2, pady=4)
+                 font=("Georgia", 13, "italic"), fg=th.TEXT_MUTED, bg=th.BG_DARK).pack(side="right")
+        separator(self, bg=th.ACCENT).pack(fill="x", padx=th.PAD*2, pady=4)
 
-        self.cards_frame = tk.Frame(self, bg=BG_DARK)
-        self.cards_frame.pack(fill="x", padx=PAD*2, pady=PAD)
+        self.cards_frame = tk.Frame(self, bg=th.BG_DARK)
+        self.cards_frame.pack(fill="x", padx=th.PAD*2, pady=th.PAD)
 
         self.balance_label = tk.Label(self, text="",
                                       font=("Georgia", 17, "bold"),
-                                      fg=SUCCESS, bg=BG_DARK)
-        self.balance_label.pack(fill="x", padx=PAD*2, pady=4)
+                                      fg=th.SUCCESS, bg=th.BG_DARK)
+        self.balance_label.pack(fill="x", padx=th.PAD*2, pady=4)
 
-        act_frame = tk.Frame(self, bg=BG_CARD,
-                             highlightthickness=1, highlightbackground=BORDER)
-        act_frame.pack(fill="both", expand=True, padx=PAD*2, pady=PAD)
+        act_frame = tk.Frame(self, bg=th.BG_CARD,
+                             highlightthickness=1, highlightbackground=th.BORDER)
+        act_frame.pack(fill="both", expand=True, padx=th.PAD*2, pady=th.PAD)
         section_title(act_frame, "Activité récente  |  النشاط الأخير",
-                      bg=BG_CARD).pack(fill="x", padx=PAD, pady=(PAD, 4))
-        self.activity_text = tk.Text(act_frame, bg=BG_CARD, fg=TEXT_WHITE,
-                                     font=FONT_MONO, relief="flat",
+                      bg=th.BG_CARD).pack(fill="x", padx=th.PAD, pady=(th.PAD, 4))
+        self.activity_text = tk.Text(act_frame, bg=th.BG_CARD, fg=th.TEXT_WHITE,
+                                     font=th.FONT_MONO, relief="flat",
                                      state="disabled", height=10,
                                      highlightthickness=0)
-        self.activity_text.pack(fill="both", expand=True, padx=PAD, pady=(0, PAD))
+        self.activity_text.pack(fill="both", expand=True, padx=th.PAD, pady=(0, th.PAD))
         self.refresh()
 
     def refresh(self):
@@ -43,8 +42,8 @@ class DashboardPage(tk.Frame):
             w.destroy()
         stats = db.get_stats()
         for fr, ar, val, col in [
-            ("Familles",  "عائلات",   stats["families"],  ACCENT),
-            ("Enfants",   "أطفال",    stats["children"],  ACCENT2),
+            ("Familles",  "عائلات",   stats["families"],  th.ACCENT),
+            ("Enfants",   "أطفال",    stats["children"],  th.ACCENT2),
             ("Donateurs", "متبرعون",  stats["donors"],    "#5B9BD5"),
             ("Dons",      "تبرعات",   stats["donations"], "#9B59B6"),
         ]:
@@ -52,7 +51,7 @@ class DashboardPage(tk.Frame):
 
         bal = stats["balance"]
         self.balance_label.config(
-            fg=SUCCESS if bal >= 0 else DANGER,
+            fg=th.SUCCESS if bal >= 0 else th.DANGER,
             text=(f"💰 Entrées : {stats['total_in']:,.0f} DA   |   "
                   f"📤 Sorties : {stats['total_out']:,.0f} DA   |   "
                   f"⚖️ Solde : {bal:,.0f} DA"))
