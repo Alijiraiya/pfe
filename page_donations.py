@@ -13,7 +13,7 @@ class DonationsPage(tk.Frame):
         self.load_data()
 
     def _build(self):
-        tk.Label(self, text="Gestion des Dons | إدارة التبرعات", font=TM.FONTS["title"], fg=TM.get_color("accent"), bg=TM.get_color("bg")).pack(side="top", fill="x", padx=TM.SIZES["pad"]*2, pady=(TM.SIZES["pad"], 4))
+        tk.Label(self, text="Gestion des Dons | التبرعات ادارة", font=TM.FONTS["title"], fg=TM.get_color("accent"), bg=TM.get_color("bg")).pack(side="top", fill="x", padx=TM.SIZES["pad"]*2, pady=(TM.SIZES["pad"], 4))
         separator(self).pack(side="top", fill="x", padx=TM.SIZES["pad"]*2, pady=4)
 
         self.banner = tk.Label(self, text="", font=TM.FONTS["body_b"], fg=TM.get_color("success"), bg=TM.get_color("card"), pady=8)
@@ -47,7 +47,7 @@ class DonationsPage(tk.Frame):
         # -- قسم التبرعات --
         right = tk.Frame(pane, bg=TM.get_color("bg"))
         right.grid(row=0, column=1, sticky="nsew", padx=(TM.SIZES["pad"]//2, 0))
-        tk.Label(right, text="Dons reçus | التبرعات المستلمة", font=TM.FONTS["heading"], fg=TM.get_color("accent"), bg=TM.get_color("bg")).pack(side="top", pady=4)
+        tk.Label(right, text="Dons reçus | المستلمة التبرعات", font=TM.FONTS["heading"], fg=TM.get_color("accent"), bg=TM.get_color("bg")).pack(side="top", pady=4)
 
         donbb = tk.Frame(right, bg=TM.get_color("bg"))
         donbb.pack(side="bottom", pady=10)
