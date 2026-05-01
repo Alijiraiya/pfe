@@ -21,6 +21,8 @@ class CharityApp(tk.Tk):
         self.title("Logiciel de l'Imam | برنامج الإمام لإدارة التبرعات")
         self.geometry("1024x720")
         self.minsize(900, 600)
+        
+        # فتح البرنامج بأقصى حجم للشاشة تلقائياً
         try: self.state('zoomed') 
         except: self.attributes('-zoomed', True)
             
@@ -32,13 +34,17 @@ class CharityApp(tk.Tk):
         self.after(100, lambda: LoginWindow(self, self._on_auth))
 
     def _build_shell(self):
+        # 1. إعدادات الشبكة للتجاوب مع الشاشة
+        self.grid_columnconfigure(1, weight=1) # يجعل المحتوى يأخذ كل العرض المتبقي
+        self.grid_rowconfigure(0, weight=1)    # يجعل المحتوى يأخذ كل الارتفاع المتاح
+
+        # 2. القائمة الجانبية (شريط ثابت العرض)
         self.sidebar = tk.Frame(self, bg=TM.get_color("sidebar"), width=TM.SIZES["sidebar_w"])
-        self.sidebar.pack(side="left", fill="y")
+        self.sidebar.grid(row=0, column=0, sticky="ns") # تلتصق بالأعلى والأسفل فقط
         self.sidebar.pack_propagate(False)
 
         self.lbl_logo = tk.Label(self.sidebar, text="🕌", font=("", 34), bg=TM.get_color("sidebar"), fg=TM.get_color("accent"))
         self.lbl_logo.pack(pady=(24, 0))
-        # جعلنا النص في سطر واحد حتى لا يعتبره السطر الثاني لغة عربية فقط
         self.lbl_title = tk.Label(self.sidebar, text="Gestion des Dons\nالتبرعات ادارة", font=TM.FONTS["heading"], fg=TM.get_color("accent"), bg=TM.get_color("sidebar"))
         self.lbl_title.pack(pady=(4, 20))
         
@@ -57,8 +63,9 @@ class CharityApp(tk.Tk):
         self.quit_btn = tk.Button(self.sidebar, text="⏻ Quitter | خروج", font=TM.FONTS["small"], fg=TM.get_color("danger"), bg=TM.get_color("sidebar"), relief="flat", command=self.destroy)
         self.quit_btn.pack(side="bottom", pady=8)
 
+        # 3. منطقة المحتوى (تتمدد لملء الفراغ المتبقي)
         self.content = tk.Frame(self, bg=TM.get_color("bg"))
-        self.content.pack(side="left", fill="both", expand=True)
+        self.content.grid(row=0, column=1, sticky="nsew") # تلتصق بالاتجاهات الأربعة
 
     def _on_auth(self):
         self.deiconify()
