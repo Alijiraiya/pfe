@@ -12,7 +12,7 @@ class FamiliesPage(tk.Frame):
         self._build()
 
     def _build(self):
-        tk.Label(self, text="Gestion des Familles |العائلات ادارة", font=TM.FONTS["title"], fg=TM.get_color("accent"), bg=TM.get_color("bg")).pack(side="top", fill="x", padx=TM.SIZES["pad"]*2, pady=(TM.SIZES["pad"]*2, 4))
+        tk.Label(self, text="Gestion des Familles | العائلات ادارة", font=TM.FONTS["title"], fg=TM.get_color("accent"), bg=TM.get_color("bg")).pack(side="top", fill="x", padx=TM.SIZES["pad"]*2, pady=(TM.SIZES["pad"]*2, 4))
         separator(self).pack(side="top", fill="x", padx=TM.SIZES["pad"]*2, pady=4)
 
         sf = tk.Frame(self, bg=TM.get_color("bg"))
@@ -217,17 +217,146 @@ class FamilyForm(tk.Toplevel):
 
 class ChildrenWindow(tk.Toplevel):
     def __init__(self, parent, fid, name):
-        super().__init__(parent); self.title(f"Enfants | أطفال - {name}"); self.configure(bg=TM.get_color("bg")); self.geometry("800x500"); self.fid = fid; self._build(); self.load()
+        super().__init__(parent)
+        self.title(f"Enfants | أطفال - {name}")
+        self.configure(bg=TM.get_color("bg"))
+        self.geometry("900x550")
+        self.fid = fid
+        self._selected_id = None
+        self._build()
+        self.load()
+
     def _build(self):
-        self.c, self.tree = create_treeview(self, ["id","n","d"], ["#", "Nom | الاسم", "Date Nais. | تاريخ الميلاد"], [50,200,150]); self.c.pack(fill="both", expand=True, padx=20, pady=20)
+        form_frame = tk.Frame(self, bg=TM.get_color("bg"))
+        form_frame.pack(side="top", fill="x", padx=20, pady=10)
+        
+        f1, self.v_name, _ = entry_row(form_frame, "Nom | الاسم :", width=15)
+        f1.pack(side="left", padx=5)
+        
+        f2, self.v_dob, _ = entry_row(form_frame, "Date Nais | الميلاد (YYYY-MM-DD) :", width=12)
+        f2.pack(side="left", padx=5)
+        
+        f3, self.v_school, _ = combo_row(form_frame, "Scolarisé | متمدرس :", ["Oui | نعم", "Non | لا"], width=12)
+        f3.pack(side="left", padx=5)
+
+        btn_frame = tk.Frame(self, bg=TM.get_color("bg"))
+        btn_frame.pack(side="top", fill="x", padx=20, pady=5)
+        
+        create_button(btn_frame, "➕ Ajouter | إضافة", self._add).pack(side="left", padx=5)
+        create_button(btn_frame, "✏️ Modifier | تعديل", self._edit).pack(side="left", padx=5)
+        create_button(btn_frame, "🗑️ Supprimer | حذف", self._delete, "danger").pack(side="left", padx=5)
+        create_button(btn_frame, "🧹 Vider | تفريغ الخانات", self._clear_form).pack(side="right", padx=5)
+
+        self.c, self.tree = create_treeview(self, ["id","n","d","s"], ["#", "Nom | الاسم", "Date Nais. | تاريخ الميلاد", "Scolarisé | متمدرس"], [50, 250, 150, 150])
+        self.c.pack(fill="both", expand=True, padx=20, pady=10)
+        self.tree.bind("<<TreeviewSelect>>", self.on_select)
+
     def load(self):
         for r in self.tree.get_children(): self.tree.delete(r)
-        for r in db.get_children_by_family(self.fid): self.tree.insert("", "end", values=(r[0], r[2], r[3]))
+        for r in db.get_children_by_family(self.fid): 
+            self.tree.insert("", "end", iid=str(r[0]), values=(r[0], r[2], r[3], r[6]))
+
+    def on_select(self, _):
+        sel = self.tree.selection()
+        if sel:
+            self._selected_id = int(sel[0])
+            item = self.tree.item(sel[0])['values']
+            self.v_name.set(item[1])
+            self.v_dob.set(item[2])
+            self.v_school.set(item[3])
+
+    def _clear_form(self):
+        self.v_name.set("")
+        self.v_dob.set("")
+        self.v_school.set("Oui | نعم")
+        self._selected_id = None
+        if self.tree.selection():
+            self.tree.selection_remove(self.tree.selection())
+
+    def _get_args(self):
+        return (
+            self.v_name.get().strip(), self.v_dob.get().strip(), 'Masculin', 'Non', 
+            self.v_school.get(), '', '', '', 'Non', 'Bonne', '', '', 'Non', 'Oui', ''
+        )
+
+    def _add(self):
+        if not self.v_name.get().strip(): 
+            return messagebox.showerror("Erreur | خطأ", "Le nom est requis | الاسم إلزامي", parent=self)
+        db.add_child(self.fid, *self._get_args())
+        self.load()
+        self._clear_form()
+
+    def _edit(self):
+        if not self._selected_id: 
+            return messagebox.showwarning("Info | تنبيه", "Sélectionnez un enfant | يرجى اختيار طفل من الجدول", parent=self)
+        if not self.v_name.get().strip(): return
+        db.update_child(self._selected_id, *self._get_args())
+        self.load()
+        self._clear_form()
+
+    def _delete(self):
+        if not self._selected_id: return
+        if messagebox.askyesno("Confirmation | تأكيد", "Supprimer ? | هل أنت متأكد من الحذف؟", parent=self):
+            db.delete_child(self._selected_id)
+            self.load()
+            self._clear_form()
 
 
 class FamilyDetailWindow(tk.Toplevel):
     def __init__(self, parent, row):
-        super().__init__(parent); self.title(row[1]); self.configure(bg=TM.get_color("bg")); self.geometry("600x400")
-        tk.Label(self, text=f"Fiche Famille | ملف العائلة : {row[1]}", font=TM.FONTS["title"], fg=TM.get_color("accent"), bg=TM.get_color("bg")).pack(pady=20)
-        tk.Label(self, text=f"Score SVF | نقاط : {row[20]}", font=TM.FONTS["heading"], fg=TM.get_color("text"), bg=TM.get_color("bg")).pack(pady=10)
-        create_button(self, "Fermer | إغلاق", self.destroy).pack(pady=20)
+        super().__init__(parent)
+        self.title(f"Fiche de la famille | ملف العائلة : {row[1]}")
+        self.configure(bg=TM.get_color("bg"))
+        self.geometry("750x600")
+        self.grab_set()
+
+        tk.Label(self, text=f"Dossier Complet | الملف الكامل : {row[1]}", font=TM.FONTS["title"], fg=TM.get_color("accent"), bg=TM.get_color("bg")).pack(pady=(15, 5))
+        
+        score_color = TM.get_color("danger") if row[20] >= 60 else TM.get_color("success")
+        tk.Label(self, text=f"Score SVF | نقاط الضعف : {row[20]}", font=TM.FONTS["heading"], fg=score_color, bg=TM.get_color("bg")).pack(pady=(0, 10))
+        
+        separator(self).pack(fill="x", padx=20)
+
+        nb = ttk.Notebook(self, style="Custom.TNotebook")
+        nb.pack(fill="both", expand=True, padx=20, pady=10)
+
+        t1 = tk.Frame(nb, bg=TM.get_color("card"))
+        t2 = tk.Frame(nb, bg=TM.get_color("card"))
+        t3 = tk.Frame(nb, bg=TM.get_color("card"))
+        
+        nb.add(t1, text=" Identité & Social | الهوية والوضع الاجتماعي ")
+        nb.add(t2, text=" Finances | المالية ")
+        nb.add(t3, text=" Logement & Santé | السكن والصحة ")
+
+        self._build_info_row(t1, "Nom Chef | اسم رب الأسرة", row[1])
+        self._build_info_row(t1, "Conjoint(e) | اسم الزوج(ة)", row[2])
+        self._build_info_row(t1, "Téléphone | الهاتف", row[3])
+        self._build_info_row(t1, "Adresse | العنوان", row[4])
+        self._build_info_row(t1, "N° CCP | رقم الحساب البريدي", row[5])
+        self._build_info_row(t1, "Sit. Familiale | الحالة الزوجية", row[10])
+        self._build_info_row(t1, "Sit. Sociale | الوضع الاجتماعي", row[12])
+        self._build_info_row(t1, "Nb Membres | عدد الأفراد", row[11])
+
+        self._build_info_row(t2, "Revenu Mensuel | الدخل الشهري", f"{row[6]:,.0f} DA")
+        self._build_info_row(t2, "Loyer | مبلغ الإيجار", f"{row[7]:,.0f} DA")
+        self._build_info_row(t2, "Type d'emploi | نوع العمل", row[8])
+        self._build_info_row(t2, "Sources | مصادر الدخل", row[9])
+
+        self._build_info_row(t3, "Locataire | مستأجر", row[15])
+        self._build_info_row(t3, "Type de logement | نوع السكن", row[16])
+        self._build_info_row(t3, "Surface | المساحة", f"{row[17]} m²")
+        self._build_info_row(t3, "Pièces | عدد الغرف", row[18])
+        self._build_info_row(t3, "État du logement | الحالة العامة للسكن", row[19])
+        
+        tk.Frame(t3, height=1, bg=TM.get_color("border")).pack(fill="x", pady=10, padx=20)
+        
+        self._build_info_row(t3, "État santé | الحالة الصحية", row[13])
+        self._build_info_row(t3, "Maladie chron. | أمراض مزمنة", row[14])
+
+        create_button(self, "✖ Fermer | إغلاق", self.destroy).pack(pady=10)
+
+    def _build_info_row(self, parent, label, value):
+        f = tk.Frame(parent, bg=TM.get_color("card"))
+        f.pack(fill="x", padx=20, pady=7)
+        tk.Label(f, text=f"{label} :", font=TM.FONTS["body_b"], fg=TM.get_color("text_muted"), bg=TM.get_color("card"), width=35, anchor="w").pack(side="left")
+        tk.Label(f, text=str(value) if value else "---", font=TM.FONTS["body"], fg=TM.get_color("text"), bg=TM.get_color("card"), anchor="w").pack(side="left", fill="x", expand=True)
